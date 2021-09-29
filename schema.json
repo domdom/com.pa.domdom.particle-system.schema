@@ -1,0 +1,347 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description" : "Planetary Annihilation Particle System.",
+  "$defs": {
+    "emitterTime": {
+      "type": "number",
+      "description": "Time in 'real time' of the emitter's lifetime."
+    },
+    "propertyConstant": {
+      "type": "number",
+      "description": "Property value."
+    },
+    "emitterTimeCurveArray": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": [
+          { "$ref": "#/$defs/emitterTime" },
+          { "$ref": "#/$defs/propertyConstant" }
+        ],
+        "minItems": 2,
+        "maxItems": 2
+      }
+    },
+    "emitterTimeCurveObject": {
+      "type": "object",
+      "properties": {
+        "keys": { "$ref": "#/$defs/emitterTimeCurveArray" },
+        "stepped": {
+          "type": "boolean",
+          "default": false,
+          "description": "Control the interpolation between keyframes. Setting stepped to true means values don't change up until the new keyframe time arrives, at which point it snaps immediately. By default values are smoothed linearly between times."
+        }
+      }
+    },
+    "emitterTimeCurve": {
+      "description": "A curve in 'real time', matching against the current emitter's lifetime.",
+      "anyOf": [
+        { "$ref": "#/$defs/propertyConstant" },
+        { "$ref": "#/$defs/emitterTimeCurveObject" },
+        { "$ref": "#/$defs/emitterTimeCurveArray" }
+      ]
+    },
+    "particleTime": {
+      "type": "number",
+      "description": "Time normalized to particle lifetime (0..1)."
+    },
+    "particleTimeCurveArray": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": [
+          { "$ref": "#/$defs/particleTime" },
+          { "$ref": "#/$defs/propertyConstant" }
+        ],
+        "minItems": 2,
+        "maxItems": 2
+      }
+    },
+    "particleTimeCurveObject": {
+      "type": "object",
+      "properties": {
+        "keys": { "$ref": "#/$defs/particleTimeCurveArray" },
+        "stepped": {
+          "type": "boolean",
+          "default": false,
+          "description": "Control the interpolation between keyframes. Setting stepped to true means values don't change up until the new keyframe time arrives, at which point it snaps immediately. By default values are smoothed linearly between times."
+        }
+      }
+    },
+    "particleTimeCurve": {
+      "description": "Particle time curves are normalized to the particle's lifetime.",
+      "anyOf": [
+        { "$ref": "#/$defs/propertyConstant" },
+        { "$ref": "#/$defs/particleTimeCurveObject" },
+        { "$ref": "#/$defs/particleTimeCurveArray" }
+      ]
+    }
+  },
+  "properties": {
+    "emitters": {
+      "description": "A list of emitter objects in the system.",
+      "type": "array",
+      "items": {
+        "description": "Particle Emitter",
+        "type": "object",
+        "properties": {
+          "spec": {
+            "description": "Particle spec definition",
+            "type": "object"
+          },
+          "type": {
+            "description": "Defines the shape of the particle spawn positions, and how the offsetRange* keys are used",
+            "type": "string",
+            "enum": ["POSITION", "SPHEROID", "SHELL", "EMITTER", "CYLINDER_X", "CYLINDER_Y", "CYLINDER_Z", "BOX_X", "BOX_Y", "BOX_Z", "MESH"],
+            "default": "POSITION"
+          },
+          "linkIndex": {
+            "description": "Used with 'EMITTER' type to define which emitter to attached to.",
+            "type": "integer",
+            "default": -1
+          },
+
+          "offsetX": {
+            "description": "Define the starting spawn position for particles in emitter space.",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "offsetY": {
+            "description": { "$ref": "3/offsetX/description" },
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "offsetZ": {
+            "description": { "$ref": "3/offsetX/description" },
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "offsetRangeX": {
+            "description": "Define the starting spawn position range +/- the start position in emitter space.",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "offsetRangeY": {
+            "description": { "$ref": "3/offsetRangeX/description" },
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "offsetRangeZ": {
+            "description": { "$ref": "3/offsetRangeX/description" },
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+
+          "offsetAllowNegZ": {
+            "description": "Allow particles to spawn with an initial position with a negative Z in emitter space, otherwise flip Z to a positive position. Useful for explosions on the ground.",
+            "type": "boolean",
+            "default": true
+          },
+
+          "velocityX": {
+            "description": "Initial velocity direction in emitter space. Used to define a normalized vector direction.",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "velocityY": {
+            "description": { "$ref": "3/velocityX/description" },
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "velocityZ": {
+            "description": { "$ref": "3/velocityX/description" },
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "velocityRangeX": {
+            "description": "Initial velocity direction range +/- in emitter space. Used to define a normalized vector direction.",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "velocityRangeY": {
+            "description": { "$ref": "3/velocityRangeX/description" },
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "velocityRangeZ": {
+            "description": { "$ref": "3/velocityRangeX/description" },
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+
+          "useRadialVelocityDir": {
+            "description": "Use the starting location as a normalized vector, added to the velocity direction values.",
+            "type": "boolean",
+            "default": false
+          },
+          "useShapeVelocityDir": {
+            "description": "Use the starting position on the shape from the emitter’s type in addition to the velocity direction values",
+            "type": "boolean",
+            "default": false
+          },
+
+          "velocity": {
+            "description": "Initial particle velocity along velocity dir at spawn.",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+
+          "velocityRange": {
+            "description": "Initial particle velocity range +/- velocity",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+
+          "inheritedVelocity": {
+            "description": "Add the system’s velocity multiplied by this value to the initial particle velocity.",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+
+          "gravity": {
+            "description": "Particle gravity over the emitter lifetime. Always in world space towards the center of the planet. Affects all particles in the emitter. Value is in world units per second with negative numbers going towards the planet center.",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+
+          "accelX": {
+            "description": "Particle acceleration over the emitter lifetime in emitter space. Affects all particles in the emitter. These values are absolute acceleration values and not normalized like velocity. (May have odd results with world space particles.)",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "accelY": {
+            "description": { "$ref": "3/accelX/description" },
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "accelZ": {
+            "description": { "$ref": "3/accelX/description" },
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+
+
+          "drag": {
+            "description": "Particle velocity multiplier over the emitter lifetime. Affects all particles in the emitter. Note: a drag of 1.0 is no drag, a drag of 0.0 turns drag off which is the same thing. A real drag of 0.0 would disable all movement. Drag values greater than 1.0 will cause particles to accelerate.",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+
+          "sizeX": {
+            "description": "Defines the particle size in world units.",
+            "default": 1.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "sizeY": {
+            "description": { "$ref": "3/sizeX/description" },
+            "default": 1.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+
+          "sizeRangeX": {
+            "description": "Defines the particle size range in world units.",
+            "default": 1.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "sizeRangeY": {
+            "description": { "$ref": "3/sizeRangeX/description" },
+            "default": 1.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+
+          "sizeRangeFlip": {
+            "description": "Defines if the particle’s size can be negated on one or both axis. The result is it randomly chooses how the texture is flipped on particle spawn. Helps randomize the appearance of a particle especially if the texture used has a strong pattern.",
+            "default": false,
+            "type": "boolean"
+          },
+          "sizeRangeFlipX": {
+            "description": { "$ref": "3/sizeRangeFlip/description" },
+            "default": false,
+            "type": "boolean"
+          },
+          "sizeRangeFlipY": {
+            "description": { "$ref": "3/sizeRangeFlip/description" },
+            "default": false,
+            "type": "boolean"
+          },
+
+          "sizeSquareAspect": {
+            "description": "Force particles to be square. Defaults to true if no sizeY is defined.",
+            "type": "boolean",
+            "default": false
+          },
+
+          "sizeConstantAspect": {
+            "description": "Force particles to have a constant sizeX:sizeY ratio when using sizeRangeX. Defaults to true if no sizeRangeY is defined.",
+            "type": "boolean",
+            "default": false
+          },
+
+          "rotation": {
+            "description": "Defines the initial particle rotation orientation. Value is in radians (about 6.2832 is one full rotation).",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "rotationRange": {
+            "description": "Defines the initial particle rotation orientation range, +/- the initial rotation. Value is in radians (about 3.1416 encompasses the entire possible rotation range).",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+
+          "rotationRate": {
+            "description": "Defines the particle rotation rate on spawned. Value is in radians per second (about 6.2832 will cause a particle to rotate one full rotation over a second).",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "rotationRateRange": {
+            "description": "Defines the particle rotation rate range on spawn +/- the rotationRate. Value is in radians per second.",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+
+
+          "snapToSurface": {
+            "description": "Option to snap a particle’s spawn position to the ground mesh surface. Takes the offset location and traces towards the center of the planet. If the particle offset is underground it will snap to the surface. Will always snap to the highest point on the land. Does not test against units, only the planet surface mesh. **THIS IS EXPENSIVE, USE ONLY WHEN NEEDED!**",
+            "type": "boolean",
+            "default": false
+          },
+
+          "snapToSurfaceOffset": {
+            "description": "Particle spawn distance from the ground surface when using snapToSurface. Is always in a direction away from the planet center, not the surface normal.",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+
+          "alignVelocityToSurface": {
+            "description": "Align velocity directions when using snapToSurface to make Z up from the planet center and -Y away from the emitter along the ground (specifically perpendicular from the direction to the planet center).",
+            "type": "boolean",
+            "default": false
+          },
+
+
+          "red": {
+            "description": "Particle initial color multiplier in linear float color. Set at the time of each particle’s spawn.",
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "green": {
+            "description": { "$ref": "3/red/description" },
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "blue": {
+            "description": { "$ref": "3/red/description" },
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+          "alpha": {
+            "description": { "$ref": "3/red/description" },
+            "default": 0.0,
+            "$ref": "#/$defs/emitterTimeCurve"
+          },
+
+        }
+      }
+    }
+  }
+}
