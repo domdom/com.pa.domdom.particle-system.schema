@@ -338,8 +338,7 @@
             "description": { "$ref": "3/red/description" },
             "default": 0.0,
             "$ref": "#/$defs/emitterTimeCurve"
-          },
-
+          }
         }
       }
     }
