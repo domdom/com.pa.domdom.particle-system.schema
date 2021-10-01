@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# import json
+import json
 
 
 def enum(description, enumValues):
@@ -128,18 +128,13 @@ schema = {
                         # particle spec properties
                     }),
 
-                    property("type", "POSITION", enum("Defines the shape of the particle spawn positions, and how the offsetRange* keys are used.", [
-                             "POSITION", "SPHEROID", "SHELL", "EMITTER", "CYLINDER_X", "CYLINDER_Y", "CYLINDER_Z", "BOX_X", "BOX_Y", "BOX_Z", "MESH"])),
+                    property("type", "POSITION", enum("Defines the shape of the particle spawn positions, and how the offsetRange* keys are used.", ["POSITION", "SPHEROID", "SHELL", "EMITTER", "CYLINDER_X", "CYLINDER_Y", "CYLINDER_Z", "BOX_X", "BOX_Y", "BOX_Z", "MESH"])),
 
-                    property(
-                        "linkIndex", -1, integer("Used with 'EMITTER' type to define which emitter to attached to.")),
+                    property( "linkIndex", -1, integer("Used with 'EMITTER' type to define which emitter to attached to.")),
 
-                    property("offsetX", 0.0, emitterTimeCurve(
-                        number("Define the starting spawn position for particles in emitter space."))),
-                    property("offsetY", 0.0, emitterTimeCurve(
-                        number("Define the starting spawn position for particles in emitter space."))),
-                    property("offsetZ", 0.0, emitterTimeCurve(
-                        number("Define the starting spawn position for particles in emitter space."))),
+                    property("offsetX", 0.0, emitterTimeCurve(number("Define the starting spawn position for particles in emitter space."))),
+                    property("offsetY", 0.0, emitterTimeCurve(number("Define the starting spawn position for particles in emitter space."))),
+                    property("offsetZ", 0.0, emitterTimeCurve(number("Define the starting spawn position for particles in emitter space."))),
 
                     property("offsetRangeX", 0.0, emitterTimeCurve(number(
                         "Define the starting spawn position range +/- the start position in emitter space."))),
@@ -231,19 +226,36 @@ schema = {
                         "Align velocity directions when using snapToSurface to make Z up from the planet center and -Y away from the emitter along the ground (specifically perpendicular from the direction to the planet center).")),
 
 
-                    property("red", 0.0, emitterTimeCurve(number(
-                        "Particle initial color multiplier in linear float color. Set at the time of each particle’s spawn."))),
-                    property("green", 0.0, emitterTimeCurve(number(
-                        "Particle initial color multiplier in linear float color. Set at the time of each particle’s spawn."))),
-                    property("blue", 0.0, emitterTimeCurve(number(
-                        "Particle initial color multiplier in linear float color. Set at the time of each particle’s spawn."))),
-                    property("alpha", 0.0, emitterTimeCurve(number(
-                        "Particle initial color multiplier in linear float color. Set at the time of each particle’s spawn."))),
+                    property("red", 1.0, emitterTimeCurve(number("Particle initial color multiplier in linear float color. Set at the time of each particle’s spawn."))),
+                    property("green", 1.0, emitterTimeCurve(number("Particle initial color multiplier in linear float color. Set at the time of each particle’s spawn."))),
+                    property("blue", 1.0, emitterTimeCurve(number("Particle initial color multiplier in linear float color. Set at the time of each particle’s spawn."))),
+                    property("alpha", 1.0, emitterTimeCurve(number("Particle initial color multiplier in linear float color. Set at the time of each particle’s spawn."))),
 
+                    property("useArmyColor", 0, integer("Use the system color multiplier (0), the primary team color (1), or secondary team color (2) for this emitter.")),
+                    property("rampV", 0.0, emitterTimeCurve(number("Defines the initial V of the UV of the ramp texture in particle shaders that use it. Otherwise used in string particles to define texture repeat distance in world units."))),
+                    property("rampRangeV", 0.0, emitterTimeCurve(number("Defines the initial V range of the UV of the ramp texture +/- the rampV in particle shaders that use it. Otherwise used in string particles to define the texture repeat distance +/- the rampV in world units."))),
+                    property("rampOffsetV", False, boolean("Randomly offset the texture on string particles.")),
+
+                    property("lifetime", 1.0, emitterTimeCurve(number("Defines initial particle lifetime in seconds."))),
+                    property("lifetimeRange", 0.0, emitterTimeCurve(number("Defines initial particle lifetime range +/- the particle lifetime."))),
+
+
+                    property("emitterLifetime", 1.0, number("Defines the emitter lifetime in seconds. This the length of time a looping emitter will repeat or how long a non-looping emitter will live before ceasing to emit particles. Particles will finish out their own lifetime after the emitterLifetime ends or a looping particle emitter is turned off.")),
+                    property("delay", 0.0, number("Defines a delay in seconds before an emitter lifetime begins the first time. Note: if all of a particle system’s emitters are delayed the particle system may shut down before anything spawns.")),
+                    property("delayRange", 0.0, number("Defines a delay range in seconds +/- the delay before an emitter lifetime begins the first time.")),
+
+                    property("bLoop", True, boolean("Defines if an emitter should loop or happen only once.")),
+                    property("loopCount", 0, integer("Defines how many times an emitter should loop before ending if bLoop is true. A value of 0 loops indefinitely, a value of 1 has the same behavior as bLoop set to false.")),
+                    property("startLoop", 0.0, number("The emitter time in seconds at which each loop of the emitter should restart the lifetime at. Note: can be a negative value.")),
+                    property("endLoop", 0.0, number("The emitter time in seconds at which each loop of the emitter should end before restarting the lifetime. A value of 0.0, a negative value, or a value greater than the emitterLifetime will use the emitterLifetime instead.")),
+
+                    property("startDistance", 0.0, number("Disables emitter if camera is closer than this distance.")),
+                    property("endDistance", 1.0, number("Disables emitter if camera is further than this distance.")),
                 )
             }
         }
     }
 }
 
-properties = []
+
+print(json.dumps(schema, indent=2))
