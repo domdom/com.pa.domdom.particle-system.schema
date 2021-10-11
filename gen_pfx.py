@@ -85,6 +85,58 @@ def emitterTimeCurve(valueType):
     # , "A curve in 'real time', matching against the current emitter's lifetime.")
     return timeCurve(emitterTime(), valueType)
 
+def bursts(description):
+
+    burstCount = integer("Number of particles to spawn in this burst")
+    burstCountRange = integer("Number of particles to spawn +/- the burstCount")
+    burstCountRange["default"] = 0
+
+    burstChance = {
+        "type": "number",
+        "description": "Chance of spawning this burst.",
+        "default": 1.0,
+        "min": 0,
+        "max": 1
+    }
+
+    burstBasic = {
+        "type": "array",
+        "items": [
+            emitterTime(),
+            burstCount,
+            burstCountRange,
+            burstChance
+        ],
+        "minItems": 2,
+        "maxItems": 4
+    }
+
+    burstComplete = {
+        "type": "object",
+        "properties": {
+            "time": emitterTime(),
+            "count": integer("Number of particles to spawn in this burst"),
+            "countRange": integer("Number +- of particles to spawn in this burst"),
+            "chance": burstChance
+        }
+    }
+
+    return {
+        "description": description,
+        "anyOf": [
+            integer("number of particles to emit at time 0."),
+            {
+                "type": "array",
+                "items": {
+                    "anyOf": [
+                        burstBasic,
+                        burstComplete
+                    ]
+                }
+            }
+        ]
+    }
+
 def sRGBColor(description):
     return {
         "type": "integer",
@@ -157,6 +209,13 @@ schema = {
     "description": "Planetary Annihilation Particle System.",
     "type": "object",
     "properties": {
+        "color": {
+            "description": "A system wide color multiplier. Value is RGBA linear floats in array form.",
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": { "type": "number" }
+        },
         "emitters": {
             "description": "A list of emitter objects in the system.",
             "type": "array",
@@ -260,9 +319,9 @@ schema = {
                     property("interpolateSpawn", False, boolean("Interpolate the position of world space particles on moving particle systems. Spreads the particles across the current and previous particle system positions to keep smooth position distributions.")),
                     property("killOnDeactivate", False, boolean("Immediately remove all particles in the emitter if the particle system is disabled. Mainly used on looping effects in the game. Does not kill particles when the emitter lifetime ends.")),
 
-                    property("emissionBursts", 0, boolean("Define bursts of particles over the emitter’s lifetime")),
+                    property("emissionBursts", 0, bursts("Define bursts of particles over the emitter's lifetime")),
                     property("emissionRate", 20.0, emitterTimeCurve(number("Define the number of particles per second to spawn. Defaults to 0.0 if emissionBursts is defined."))),
-                    property("maxParticles", None, number("Max number of live particles allowed in the emitter at one time. This is not a running total, but a current living count limit. If left undefined it is generally “smart”; it tries to determine the max number based on emit rate and particle lifetime.")),
+                    property("maxParticles", None, number("Max number of live particles allowed in the emitter at one time. This is not a running total, but a current living count limit. If left undefined it is generally 'smart'; it tries to determine the max number based on emit rate and particle lifetime.")),
 
                 )
             }
@@ -271,5 +330,5 @@ schema = {
 }
 
 
-with open("pfx-schema") as f:
+with open("pfx-schema", "w") as f:
     json.dump(schema, f, indent=2)
